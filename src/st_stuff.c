@@ -331,6 +331,7 @@ int ammo_yellow;   // ammo percent less is yellow more green
 int health_red;    // health amount less than which status is red
 int health_yellow; // health amount less than which status is yellow
 int health_green;  // health amount above is blue, below is green
+dboolean armor_color_behavior; // colour armour by type not amount
 int armor_red;     // armor amount less than which status is red
 int armor_yellow;  // armor amount less than which status is yellow
 int armor_green;   // armor amount above is blue, below is green
@@ -822,9 +823,11 @@ static void ST_drawWidgets(dboolean refresh)
     STlib_updateNum(&w_ready, CR_BLUE2, refresh);
   else {
     if (plyr->maxammo[weaponinfo[w_ready.data].ammo])
-      ammopct = (*w_ready.num*100)/plyr->maxammo[weaponinfo[w_ready.data].ammo];
-    if (plyr->backpack && ammo_colour_behaviour != ammo_colour_behaviour_yes)
-      ammopct *= 2;
+      // This ugly blob fixes a rounding error with a backpack
+      ammopct = (((plyr->backpack &&
+		   (ammo_colour_behaviour != ammo_colour_behaviour_yes))
+		  ? 200: 100) * *w_ready.num 
+		 / plyr->maxammo[weaponinfo[w_ready.data].ammo]);
     if (ammopct < ammo_red)
       STlib_updateNum(&w_ready, CR_RED, refresh);
     else
@@ -850,14 +853,25 @@ static void ST_drawWidgets(dboolean refresh)
     STlib_updatePercent(&w_health, CR_BLUE2, refresh); //killough 2/28/98
 
   //jff 2/16/98 make color of armor depend on amount
-  if (*w_armor.n.num<armor_red)
-    STlib_updatePercent(&w_armor, CR_RED, refresh);
-  else if (*w_armor.n.num<armor_yellow)
-    STlib_updatePercent(&w_armor, CR_GOLD, refresh);
-  else if (*w_armor.n.num<=armor_green)
-    STlib_updatePercent(&w_armor, CR_GREEN, refresh);
-  else
-    STlib_updatePercent(&w_armor, CR_BLUE2, refresh); //killough 2/28/98
+  if (armor_color_behavior) {
+    if (*w_armor.n.num == 0)
+      STlib_updatePercent(&w_armor, CR_RED, refresh);
+    else if (plyr->armortype == 0) // How?
+      STlib_updatePercent(&w_armor, CR_BROWN, refresh);
+    else if (plyr->armortype == 1) 
+      STlib_updatePercent(&w_armor, CR_GREEN, refresh);
+    else if (plyr->armortype == 2)
+      STlib_updatePercent(&w_armor, CR_BLUE2, refresh);
+  } else { 
+    if (*w_armor.n.num<armor_red)
+      STlib_updatePercent(&w_armor, CR_RED, refresh);
+    else if (*w_armor.n.num<armor_yellow)
+      STlib_updatePercent(&w_armor, CR_GOLD, refresh);
+    else if (*w_armor.n.num<=armor_green)
+      STlib_updatePercent(&w_armor, CR_GREEN, refresh);
+    else
+      STlib_updatePercent(&w_armor, CR_BLUE2, refresh); //killough 2/28/98
+  }
 
   //e6y: moved to ST_refreshBackground() for correct single-pass stretching
   //STlib_updateBinIcon(&w_armsbg, refresh);

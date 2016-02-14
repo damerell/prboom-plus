@@ -95,6 +95,7 @@ typedef enum
 extern int health_red;    // health amount less than which status is red
 extern int health_yellow; // health amount less than which status is yellow
 extern int health_green;  // health amount above is blue, below is green
+extern dboolean armor_color_behavior; // Colour armour by grade not by amount
 extern int armor_red;     // armor amount less than which status is red
 extern int armor_yellow;  // armor amount less than which status is yellow
 extern int armor_green;   // armor amount above is blue, below is green

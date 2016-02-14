@@ -864,6 +864,9 @@ default_t defaults[] =
    def_int,ss_stat}, // amount of armor for yellow to green transition
   {"armor_green",   {&armor_green}  , {100},0,200,// below is green, above blue
    def_int,ss_stat}, // amount of armor for green to blue transition
+  {"armor_color_behavior",{&armor_color_behavior},{0},0,1,
+   def_bool,ss_stat}, // Colour armour by type not amount. -- DJSD
+  // Do I regret using British spelling in ammo_colour_behaviour? Yes.
   {"ammo_red",      {&ammo_red}     , {25},0,100, // below 25% is red
    def_int,ss_stat}, // percent of ammo for red to yellow transition
   {"ammo_yellow",   {&ammo_yellow}  , {50},0,100, // below 50% is yellow, above green

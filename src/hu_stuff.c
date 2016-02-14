@@ -1229,19 +1229,31 @@ int HU_GetHealthColor(int health, int def)
   return result;
 }
 
-int HU_GetArmorColor(int armor, int def)
+int HU_GetArmorColor(int armor, int armortype, int blue)
 {
   int result;
 
-  if (armor < armor_red)
-    result = CR_RED;
-  else if (armor < armor_yellow)
-    result = CR_GOLD;
-  else if (armor <= armor_green)
-    result = CR_GREEN;
-  else
-    result = def;
-
+  if (armor_color_behavior) {
+    if (armor == 0)
+      result = CR_RED;
+    else if (armortype == 0) // How?
+      result = CR_BROWN;
+    else if (armortype == 1) 
+      result = CR_GREEN;
+    else if (armortype == 2) 
+      result = blue;
+    else
+      result = CR_BROWN; // Also should be impossible?
+  } else {
+    if (armor < armor_red)
+      result = CR_RED;
+    else if (armor < armor_yellow)
+      result = CR_GOLD;
+    else if (armor <= armor_green)
+      result = CR_GREEN;
+    else
+      result = blue;
+  }
   return result;
 }
 
@@ -1255,9 +1267,8 @@ int HU_GetAmmoColor(int ammo, int fullammo, int def, int tofire, dboolean backpa
     (ammo_colour_behaviour == ammo_colour_behaviour_no && backpack && ammo*2 >= fullammo))
     result=def;
   else {
-    ammopct = (100 * ammo) / fullammo;
-    if (backpack && ammo_colour_behaviour != ammo_colour_behaviour_yes)
-      ammopct *= 2;
+    ammopct = (((backpack &&(ammo_colour_behaviour!=ammo_colour_behaviour_yes))
+		? 200 : 100) * ammo) / fullammo;
     if (ammopct < ammo_red)
       result = CR_RED;
     else if (ammopct < ammo_yellow)
@@ -1476,6 +1487,7 @@ void HU_widget_build_armor(void)
   char *s;
   char armorstr[80]; //jff
   int armor = plr->armorpoints;
+  int armortype = plr->armortype;
   int armorbars = armor>100? 25 : armor/4;
 
   if (w_armor.val != -1 && w_armor.val == armor)
@@ -1512,7 +1524,7 @@ void HU_widget_build_armor(void)
   strcat(hud_armorstr,armorstr);
 
   // set the display color from the amount of armor posessed
-  w_armor.cm = HU_GetArmorColor(armor, CR_BLUE);
+  w_armor.cm = HU_GetArmorColor(armor, armortype, CR_BLUE);
 
   // transfer the init string to the widget
   s = hud_armorstr;
@@ -1530,6 +1542,7 @@ void HU_widget_build_armor_big(void)
   char *s;
   char armorstr[80]; //jff
   int armor = plr->armorpoints;
+  int armortype = plr->armortype;
 
   if (w_armor_big.val != -1 && w_armor_big.val == armor)
     return;
@@ -1542,7 +1555,7 @@ void HU_widget_build_armor_big(void)
 
   // set the display color from the amount of armor posessed
   if (!sts_always_red)
-    w_armor_big.cm = HU_GetArmorColor(armor, CR_BLUE2);
+    w_armor_big.cm = HU_GetArmorColor(armor, armortype, CR_BLUE2);
 
   // transfer the init string to the widget
   s = armorstr;
@@ -2032,6 +2045,7 @@ void HU_widget_draw_medict_percent(void)
 void HU_widget_build_armor_percent(void)
 {
   int armor = plr->armorpoints;
+  int armortype = plr->armortype;
 
   if (w_armor_percent.val != -1 && w_armor_percent.val == armor)
     return;
@@ -2045,7 +2059,7 @@ void HU_widget_build_armor_percent(void)
     if (sts_pct_always_gray)
       w_armor_percent.cm = CR_GRAY;
     else
-      w_armor_percent.cm = HU_GetArmorColor(armor, CR_BLUE2);
+      w_armor_percent.cm = HU_GetArmorColor(armor, armortype, CR_BLUE2);
   }
 
   HUlib_addCharToTextLine(&w_armor_percent, (char)('!' + 13));
