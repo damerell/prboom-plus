@@ -1035,6 +1035,8 @@ void HU_widget_build_medict_percent(void);
 void HU_widget_draw_medict_percent(void);
 void HU_widget_build_armor_percent(void);
 void HU_widget_draw_armor_percent(void);
+int HU_count_health_percent(void);
+int HU_count_armor_percent(void);
 
 void HU_widget_build_ammo_big(void);
 void HU_widget_draw_ammo_big(void);
@@ -1238,9 +1240,11 @@ int HU_GetArmorColor(int armor, int armortype, int blue)
       result = CR_RED;
     else if (armortype == 0) // How?
       result = CR_BROWN;
-    else if (armortype == 1) 
+    else if (armortype == green_armor_class) 
       result = CR_GREEN;
-    else if (armortype == 2) 
+    else if ((armortype == blue_armor_class) ||
+	     (armortype == idfa_armor_class) ||
+	     (armortype == idkfa_armor_class)) // probably can't happen
       result = blue;
     else
       result = CR_BROWN; // Also should be impossible?
@@ -1264,10 +1268,10 @@ int HU_GetAmmoColor(int ammo, int fullammo, int def, int tofire, dboolean backpa
   if (ammo < tofire)
     result = CR_BROWN;
   else if ((ammo==fullammo) || 
-    (ammo_colour_behaviour == ammo_colour_behaviour_no && backpack && ammo*2 >= fullammo))
+    (ammo_color_behavior == ammo_color_behavior_no && backpack && ammo*2 >= fullammo))
     result=def;
   else {
-    ammopct = (((backpack &&(ammo_colour_behaviour!=ammo_colour_behaviour_yes))
+    ammopct = (((backpack &&(ammo_color_behavior!=ammo_color_behavior_yes))
 		? 200 : 100) * ammo) / fullammo;
     if (ammopct < ammo_red)
       result = CR_RED;
@@ -1352,11 +1356,15 @@ void HU_widget_build_health(void)
   char *s;
   char healthstr[80];//jff
   int health = plr->health;
-  int healthbars = health>100? 25 : health/4;
+  int healthbars;
+  int healthpct = HU_count_health_percent();
+  if (healthpct > 100)
+    healthpct = 100;
+  healthbars = healthpct / 4;
 
-  if (w_health.val != -1 && w_health.val == health)
+  if (w_health.val != -1 && w_health.val == healthpct)
     return;
-  w_health.val = health;
+  w_health.val = healthpct;
 
   // clear the widgets internal line
   HUlib_clearTextLine(&w_health);
@@ -1488,11 +1496,15 @@ void HU_widget_build_armor(void)
   char armorstr[80]; //jff
   int armor = plr->armorpoints;
   int armortype = plr->armortype;
-  int armorbars = armor>100? 25 : armor/4;
+  int armorbars;
+  int armorpct = HU_count_armor_percent();
+  if (armorpct > 100) 
+    armorpct = 100;
+  armorbars = armorpct / 4;
 
-  if (w_armor.val != -1 && w_armor.val == armor)
+  if (w_armor.val != -1 && w_armor.val == armorpct)
     return;
-  w_armor.val = armor;
+  w_armor.val = armorpct;
 
   // clear the widgets internal line
   HUlib_clearTextLine(&w_armor);
@@ -1641,14 +1653,14 @@ void HU_widget_build_weapon(void)
     else if (ammo<ammopershot[w])
       hud_weapstr[i++] = '0'+CR_BROWN;
     else if (fullammo && ((ammo==fullammo) ||
-      (ammo_colour_behaviour == ammo_colour_behaviour_no &&
+      (ammo_color_behavior == ammo_color_behavior_no &&
       plr->backpack && ammo*2 >= fullammo)))
       hud_weapstr[i++] = '0'+CR_BLUE;
     else
     {
       ammopct = fullammo ? (100*ammo)/fullammo : 100;
       if (plr->backpack && fullammo &&
-        ammo_colour_behaviour != ammo_colour_behaviour_yes)
+        ammo_color_behavior != ammo_color_behavior_yes)
         ammopct *= 2;
       if (ammopct<ammo_red)
         hud_weapstr[i++] = '0'+CR_RED;
@@ -2046,7 +2058,6 @@ void HU_widget_build_armor_percent(void)
 {
   int armor = plr->armorpoints;
   int armortype = plr->armortype;
-
   if (w_armor_percent.val != -1 && w_armor_percent.val == armor)
     return;
   w_armor_percent.val = armor;
@@ -2096,6 +2107,51 @@ void HU_widget_build_ammo_big(void)
     while (*s)
       HUlib_addCharToTextLine(&w_ammo_big, *(s++));
   }
+}
+
+int HU_count_health_percent(void)
+{
+  int numerator = plr->health * 100;
+  int divisor;
+
+  switch (hud_bar_maximum) {
+  case hud_bar_maximum_twohundred:
+    divisor = 200;
+    break;
+  case hud_bar_maximum_deh:
+    divisor = maxhealth;
+    break;
+  case hud_bar_maximum_deh_super:
+    divisor = max_soul; // ignore maxhealthbonus
+    break;
+  default:
+    divisor = 100;
+    break;
+  }
+  return numerator / divisor;
+}
+int HU_count_armor_percent(void)
+{
+  int numerator = plr->armorpoints;
+  int divisor;
+  
+  switch (hud_bar_maximum) {
+  case hud_bar_maximum_twohundred:
+    divisor = 2;
+    break;
+  case hud_bar_maximum_deh:
+    divisor = green_armor_class;
+    break;
+  case hud_bar_maximum_deh_super:
+    divisor = blue_armor_class;
+    //    if (divisor < idfa_armor) // I think we should ignore the max cheat
+    //  divisor = idfa_armor;       // value if it's higher
+    break;
+  default:
+    divisor = 1;
+    break;
+  }
+  return numerator / divisor;
 }
 
 void HU_widget_draw_ammo_big(void)

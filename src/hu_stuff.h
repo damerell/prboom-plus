@@ -94,6 +94,8 @@ extern int hud_displayed;   /* hud is displayed */
 /* jff 2/18/98 hud/status control */
 extern int hud_num;
 extern int huds_count;
+extern int green_armor_class;
+extern int blue_armor_class;
 
 typedef struct custom_message_s
 {

@@ -866,14 +866,16 @@ default_t defaults[] =
    def_int,ss_stat}, // amount of armor for green to blue transition
   {"armor_color_behavior",{&armor_color_behavior},{0},0,1,
    def_bool,ss_stat}, // Colour armour by type not amount. -- DJSD
-  // Do I regret using British spelling in ammo_colour_behaviour? Yes.
+  {"hud_bar_maximum",{(int*)&hud_bar_maximum},
+   {2}, // health/armor bars go to 100 / 200 / dehacked max
+   0,hud_bar_maximum_max-1,def_int,ss_stat},
   {"ammo_red",      {&ammo_red}     , {25},0,100, // below 25% is red
    def_int,ss_stat}, // percent of ammo for red to yellow transition
   {"ammo_yellow",   {&ammo_yellow}  , {50},0,100, // below 50% is yellow, above green
    def_int,ss_stat}, // percent of ammo for yellow to green transition
-  {"ammo_colour_behaviour",{(int*)&ammo_colour_behaviour},
-   {ammo_colour_behaviour_max-1}, // whether backpack changes thresholds above
-   0,ammo_colour_behaviour_max-1,def_int,ss_stat},
+  {"ammo_color_behavior",{(int*)&ammo_color_behavior},
+   {ammo_color_behavior_max-1}, // whether backpack changes thresholds above
+   0,ammo_color_behavior_max-1,def_int,ss_stat},
 
   //jff 2/16/98 HUD and status feature controls
   {"hud_num",    {&hud_num}, {6},0,100,

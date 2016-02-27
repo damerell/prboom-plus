@@ -336,8 +336,16 @@ int armor_red;     // armor amount less than which status is red
 int armor_yellow;  // armor amount less than which status is yellow
 int armor_green;   // armor amount above is blue, below is green
 
-ammo_colour_behaviour_t ammo_colour_behaviour;
-const char *ammo_colour_behaviour_list[ammo_colour_behaviour_max] = {
+hud_bar_maximum_t hud_bar_maximum;
+const char *hud_bar_maximum_list[hud_bar_maximum_max] = {
+  "100/100",
+  "200/200",
+  "medikit/green",
+  "soulsphere/blue"
+};
+
+ammo_color_behavior_t ammo_color_behavior;
+const char *ammo_color_behavior_list[ammo_color_behavior_max] = {
   "no",
   "full ammo only",
   "yes"
@@ -818,14 +826,14 @@ static void ST_drawWidgets(dboolean refresh)
 
   //jff 2/16/98 make color of ammo depend on amount
   if ((*w_ready.num == plyr->maxammo[weaponinfo[w_ready.data].ammo]) ||
-    (ammo_colour_behaviour == ammo_colour_behaviour_no && plyr->backpack &&
+    (ammo_color_behavior == ammo_color_behavior_no && plyr->backpack &&
     *w_ready.num*2 >= plyr->maxammo[weaponinfo[w_ready.data].ammo]))
     STlib_updateNum(&w_ready, CR_BLUE2, refresh);
   else {
     if (plyr->maxammo[weaponinfo[w_ready.data].ammo])
       // This ugly blob fixes a rounding error with a backpack
       ammopct = (((plyr->backpack &&
-		   (ammo_colour_behaviour != ammo_colour_behaviour_yes))
+		   (ammo_color_behavior != ammo_color_behavior_yes))
 		  ? 200: 100) * *w_ready.num 
 		 / plyr->maxammo[weaponinfo[w_ready.data].ammo]);
     if (ammopct < ammo_red)
@@ -856,12 +864,14 @@ static void ST_drawWidgets(dboolean refresh)
   if (armor_color_behavior) {
     if (*w_armor.n.num == 0)
       STlib_updatePercent(&w_armor, CR_RED, refresh);
-    else if (plyr->armortype == 0) // How?
-      STlib_updatePercent(&w_armor, CR_BROWN, refresh);
-    else if (plyr->armortype == 1) 
+    else if (plyr->armortype == green_armor_class) 
       STlib_updatePercent(&w_armor, CR_GREEN, refresh);
-    else if (plyr->armortype == 2)
+    else if ((plyr->armortype == blue_armor_class) ||
+	     (plyr->armortype == idfa_armor_class) ||
+	     (plyr->armortype == idkfa_armor_class)) // currently impossible?
       STlib_updatePercent(&w_armor, CR_BLUE2, refresh);
+    else  // How?
+      STlib_updatePercent(&w_armor, CR_BROWN, refresh);
   } else { 
     if (*w_armor.n.num<armor_red)
       STlib_updatePercent(&w_armor, CR_RED, refresh);

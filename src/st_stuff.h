@@ -104,17 +104,30 @@ extern int ammo_yellow;   // ammo percent less is yellow more green
 extern int sts_always_red;// status numbers do not change colors
 extern int sts_pct_always_gray;// status percents do not change colors
 extern int sts_traditional_keys;  // display keys the traditional way
+extern int green_armor_class;
+extern int blue_armor_class;
+extern int idfa_armor_class;
+extern int idkfa_armor_class;
 
 extern int st_palette;    // cph 2006/04/06 - make palette visible
 
 typedef enum {
-  ammo_colour_behaviour_no,
-  ammo_colour_behaviour_full_only,
-  ammo_colour_behaviour_yes,
-  ammo_colour_behaviour_max
-} ammo_colour_behaviour_t;
-extern ammo_colour_behaviour_t ammo_colour_behaviour;
-extern const char *ammo_colour_behaviour_list[];
+  ammo_color_behavior_no,
+  ammo_color_behavior_full_only,
+  ammo_color_behavior_yes,
+  ammo_color_behavior_max
+} ammo_color_behavior_t;
+extern ammo_color_behavior_t ammo_color_behavior;
+extern const char *ammo_color_behavior_list[];
+typedef enum {
+  hud_bar_maximum_hundred,
+  hud_bar_maximum_twohundred,
+  hud_bar_maximum_deh,
+  hud_bar_maximum_deh_super,
+  hud_bar_maximum_max
+} hud_bar_maximum_t;
+extern hud_bar_maximum_t hud_bar_maximum;
+extern const char *hud_bar_maximum_list[];
 
 // e6y: makes sense for wide resolutions
 extern patchnum_t grnrock;
