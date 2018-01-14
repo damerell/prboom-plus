@@ -1243,7 +1243,7 @@ int HU_GetArmorColor(int armor, int armortype, int blue)
     else if (armortype == green_armor_class) 
       result = CR_GREEN;
     else if ((armortype == blue_armor_class) ||
-	     (armortype == idfa_armor_class) ||
+	     (armortype == idfa_armor_class) || // and idfa != green_armor
 	     (armortype == idkfa_armor_class)) // probably can't happen
       result = blue;
     else
@@ -1362,9 +1362,9 @@ void HU_widget_build_health(void)
     healthpct = 100;
   healthbars = healthpct / 4;
 
-  if (w_health.val != -1 && w_health.val == healthpct)
+  if (w_health.val != -1 && w_health.val == health)
     return;
-  w_health.val = healthpct;
+  w_health.val = health;
 
   // clear the widgets internal line
   HUlib_clearTextLine(&w_health);
@@ -1502,9 +1502,9 @@ void HU_widget_build_armor(void)
     armorpct = 100;
   armorbars = armorpct / 4;
 
-  if (w_armor.val != -1 && w_armor.val == armorpct)
+  if (w_armor.val != -1 && w_armor.val == armor)
     return;
-  w_armor.val = armorpct;
+  w_armor.val = armor;
 
   // clear the widgets internal line
   HUlib_clearTextLine(&w_armor);

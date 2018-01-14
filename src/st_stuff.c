@@ -867,7 +867,7 @@ static void ST_drawWidgets(dboolean refresh)
     else if (plyr->armortype == green_armor_class) 
       STlib_updatePercent(&w_armor, CR_GREEN, refresh);
     else if ((plyr->armortype == blue_armor_class) ||
-	     (plyr->armortype == idfa_armor_class) ||
+	     (plyr->armortype == idfa_armor_class) || // and idfa != green
 	     (plyr->armortype == idkfa_armor_class)) // currently impossible?
       STlib_updatePercent(&w_armor, CR_BLUE2, refresh);
     else  // How?
